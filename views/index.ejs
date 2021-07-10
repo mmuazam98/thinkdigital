@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/index.css" />
+  </head>
+  <body>
+    <div class="container">
+      <p id="loginError"></p>
+
+      <form id="login">
+        <div class="border-box">
+          <h2>Login Form</h2>
+          <label for="luname" id="un">Username:</label>
+          <input type="text" name="user" placeholder="Enter Username" id="luname" /><br />
+
+          <label for="lpass" id="ps">Password:</label>
+          <input type="password" name="pass" placeholder="Enter Password" id="lpass" /><br />
+
+          <button type="submit" value="Login" id="submit">Login</button>
+        </div>
+      </form>
+      <form id="signup">
+        <p id="signupError"></p>
+
+        <div class="border-box">
+          <h2>Signup Form</h2>
+          <label for="sname" id="un">Name:</label>
+          <input type="text" name="name" placeholder="Enter Name" id="sname" /><br />
+
+          <label for="suname" id="un">Username:</label>
+          <input type="text" name="username" placeholder="Enter Username" id="suname" /><br />
+
+          <label for="email" id="ps">Email id:</label>
+          <input type="email" name="email" placeholder="Enter Email" id="semail" /><br />
+
+          <label for="lpass" id="ps">Password:</label>
+          <input type="password" name="password" placeholder="Enter Password" id="spass" /><br />
+
+          <button type="submit" value="Login" id="submit">Signup</button>
+        </div>
+      </form>
+    </div>
+
+    <script src="/js/index.js"></script>
+  </body>
+</html>

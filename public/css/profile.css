@@ -1,0 +1,17 @@
+.profile-page {
+  min-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container {
+  text-align: center;
+}
+.profile-page img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+}
+.profile-page p {
+  margin: 10px 0;
+}

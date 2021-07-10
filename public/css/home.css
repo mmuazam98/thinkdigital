@@ -1,0 +1,52 @@
+.home .center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 10px;
+  opacity: 0;
+  background-color: aqua;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  animation: fadeOut 3s ease-out;
+  animation-delay: 0.5s;
+}
+
+@keyframes fadeOut {
+  0%,
+  50% {
+    opacity: 1;
+    transform: translate(-50%, 10px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+}
+
+.home .movies {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.home .movies .movie {
+  display: flex;
+  flex-direction: column;
+  margin: 0 10px 20px;
+}
+.home .movies .movie img {
+  width: 200px;
+  height: 200px;
+}
+.home .movies .movie .body {
+  white-space: nowrap;
+  width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home .movies .body a {
+  color: black;
+}
