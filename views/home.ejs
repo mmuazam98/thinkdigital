@@ -1,36 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-      integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <link rel="stylesheet" href="/css/common.css" />
-    <link rel="stylesheet" href="/css/home.css" />
-  </head>
-  <body>
-    <nav>
-      <div class="side">
-        <img src="/images/logo.png" alt="logo" />
-        <span class="brand">Lucideus</span>
+<%- include("partials/nav") %> 
+    <div class="home">
+      <div class="movies">
+        <% movies.forEach(movie => { %>
+        <div class="movie">
+          <img src="<%= movie.url %>" alt="" />
+          <div class="body">
+            <a href="#"><%= movie.title %> </a>
+          </div>
+        </div>
+        <% }) %>
       </div>
-      <div class="side">
-        <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/about">About</a></li>
-          <li><a href="/services">Services</a></li>
-        </ul>
-      </div>
-    </nav>
-
-    <div class="home"></div>
+    </div>
     <script src="/js/common.js"></script>
     <script src="/js/home.js"></script>
   </body>
