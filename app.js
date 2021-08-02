@@ -6,8 +6,10 @@ app.use(express.json());
 
 const routes = require("./routes/routes");
 const posts = require("./routes/posts");
+const comments = require("./routes/comments");
 app.use("/", routes);
 app.use("/", posts);
+app.use("/", comments);
 
 const PORT = process.env.PORT;
 
