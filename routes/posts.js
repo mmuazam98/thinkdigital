@@ -51,11 +51,16 @@ Router.get("/posts", auth, async (req, res) => {
 });
 
 Router.get("/post/:id", auth, async (req, res) => {
-  const getPost = `SELECT * FROM posts WHERE userid='${req.user.userid}' AND postid='${req.params.id}'`;
+  const getPost = `SELECT * FROM posts WHERE userid='${req.user.userid}' AND postid='${req.params.id}'`
+  const getComment = `SELECT comments.userid, comments.postid, comments.commentid, comments.commented, comments.commenttime, userdetails.name FROM comments 
+   LEFT JOIN userdetails ON comments.userid = userdetails.userid WHERE comments.postid = '${req.params.id}'`;
+ 
   try {
-    const response = await query(getPost);
-    const post = parseData(response);
-    res.status(200).send(post);
+    const commentResponse = await query(getComment);
+    const comment = parseData(commentResponse);
+    const postResponse = await query(getPost);
+    const postDetails = parseData(postResponse);
+    res.status(200).send({postDetails: postDetails, comments: comment});
   } catch (e) {
     res.status(400).json({ msg: "An error occured. Please try again later." });
   }
@@ -73,11 +78,16 @@ Router.delete("/post", auth, async (req, res) => {
 Router.patch("/post", auth, async (req, res) => {
   const { postid } = req.body;
   const getPost = `SELECT * FROM posts WHERE postid='${postid}'`;
-  console.log(getPost);
   try {
     const response = await query(getPost);
     const post = parseData(response)[0];
-    res.json({ ...post, ...req.body });
+
+    const editedPost = { ...post, ...req.body };
+    const editPost = `UPDATE posts SET title='${editedPost.title}', description='${editedPost.description}' WHERE postid='${postid}'`;
+    const editedResponse = await query(editPost);
+    if(editedResponse.affectedRows > 0){
+      res.status(200).json({msg: "Post updated successfully"});
+    } else throw new Error();
   } catch (e) {
     res.status(400).send();
   }
