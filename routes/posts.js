@@ -77,17 +77,19 @@ Router.delete("/post", auth, async (req, res) => {
 });
 Router.patch("/post", auth, async (req, res) => {
   const { postid } = req.body;
+  const userid = req.user.userid;
   const getPost = `SELECT * FROM posts WHERE postid='${postid}'`;
   try {
     const response = await query(getPost);
     const post = parseData(response)[0];
-
-    const editedPost = { ...post, ...req.body };
-    const editPost = `UPDATE posts SET title='${editedPost.title}', description='${editedPost.description}' WHERE postid='${postid}'`;
-    const editedResponse = await query(editPost);
-    if(editedResponse.affectedRows > 0){
-      res.status(200).json({msg: "Post updated successfully"});
-    } else throw new Error();
+    if(userid === post.userid){
+      const editedPost = { ...post, ...req.body };
+      const editPost = `UPDATE posts SET title='${editedPost.title}', description='${editedPost.description}' WHERE postid='${postid} AND userid='${userid}''`;
+      const editedResponse = await query(editPost);
+      if(editedResponse.affectedRows > 0){
+        res.status(200).json({msg: "Post updated successfully"});
+      } else throw new Error();
+    } else res.status(401).json({msg: "Invalid credentials, editing other user posts not allowed"})
   } catch (e) {
     res.status(400).send();
   }

@@ -54,16 +54,18 @@ Router.delete("/comment/:commentid", auth, async (req, res) => {
 
 Router.patch("/comment/:commentid", auth, async (req, res) => {
   const getComment = `SELECT * FROM comments WHERE commentid='${req.params.commentid}'`;
+  const userid = req.user.userid;
   try{
     const response = await query(getComment);
     const comment = parseData(response)[0];
-
-    const editedComment = {...comment, ...req.body};
-    const editComment = `UPDATE comments SET commented='${editedComment.commented}' WHERE commentid='${req.params.commentid}'`;
-    const editedResponse = await query(editComment);
-    if(editedResponse.affectedRows > 0){
-      res.status(200).json({ msg: "Comment edited successfully"})
-    } else throw new Error();
+    if(userid === comment.userid){
+      const editedComment = {...comment, ...req.body};
+      const editComment = `UPDATE comments SET commented='${editedComment.commented}' WHERE commentid='${req.params.commentid} AND userid='${userid}''`;
+      const editedResponse = await query(editComment);
+      if(editedResponse.affectedRows > 0){
+        res.status(200).json({ msg: "Comment edited successfully"})
+      } else throw new Error();
+    } else res.status(401).json({msg: "Invalid credentials, editing other user comments not allowed"})
   } catch (error) {
     res.send(400).json({msg: "an error occured, please try again"})
   }
