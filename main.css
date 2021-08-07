@@ -1,0 +1,169 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  overflow-x: hidden;
+}
+nav .navbar-brand a {
+  text-decoration: none;
+  font-size: 1.5rem;
+}
+nav .avatar-tiny {
+  margin: 0 20px;
+}
+
+.avatar-tiny {
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+}
+.view-profile {
+  text-decoration: none;
+}
+.floating-alert {
+  display: none;
+  position: absolute;
+  z-index: 999;
+  top: 38px;
+  left: 50%;
+  transform: translateX(-50%);
+  -moz-animation: floatingAlert ease-in 5s forwards;
+  -webkit-animation: floatingAlert ease-in 5s forwards;
+  -o-animation: floatingAlert ease-in 5s forwards;
+  animation: floatingAlert ease-in 5s forwards;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.floating-alerts .floating-alert:last-of-type {
+  display: block;
+}
+
+@keyframes floatingAlert {
+  0% {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) scale(1.2);
+  }
+
+  9% {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+  }
+
+  91% {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) scale(1.2);
+  }
+}
+
+@-webkit-keyframes floatingAlert {
+  0% {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) scale(1.2);
+  }
+
+  9% {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+  }
+
+  91% {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) scale(1.2);
+  }
+}
+
+.tall-textarea {
+  height: 300px;
+}
+.postAuthor a {
+  text-decoration: none;
+}
+.action {
+  cursor: pointer;
+}
+
+.comments-title {
+  font-weight: 600;
+}
+.comments a {
+  text-decoration: none;
+  font-size: 18px;
+}
+.comment--aligned {
+  position: relative;
+  left: 33px;
+}
+.postedAt {
+  position: relative;
+  /* top: -2px; */
+  font-size: 13px;
+}
+.delete-comment {
+  float: right;
+  cursor: pointer;
+}
+.avatar-small {
+  height: 60px;
+  width: 60px;
+  border-radius: 100%;
+}
+.name {
+  font-size: 20px;
+  margin-top: 10px;
+}
+#username {
+  font-size: 22px;
+}
+.nav-tabs {
+  overflow: hidden;
+}
+.search {
+  position: relative;
+  box-shadow: 0 0 40px rgba(51, 51, 51, 0.1);
+}
+
+.search input {
+  height: 60px;
+  text-indent: 25px;
+  border: 2px solid #d6d4d4;
+}
+
+.search input:focus {
+  box-shadow: none;
+}
+
+.search .fa-search {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 16px;
+}
+
+.search button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  height: 50px;
+  width: 110px;
+}

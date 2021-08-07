@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="/main.css">
+    <title>MyApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
+    
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container d-flex flex-column flex-md-row align-items-center px-3 py-2">
+        <h4 class="navbar-brand my-0 mr-md-auto font-weight-normal">
+          <a href="/" class="text-muted">
+            MyApp
+          </a>
+        </h4>
+        <form class="mb-0 pt-2 pt-md-0" id="login">
+          <div class="row align-items-center">
+            <div class="col-md mr-0 pr-md-0 mb-3 mb-md-0">
+              <input name="username" class="form-control form-control-sm input-dark" type="text" placeholder="Username" autocomplete="off" id="user" />
+            </div>
+            <div class="col-md mr-0 pr-md-0 mb-3 mb-md-0">
+              <input name="password" class="form-control form-control-sm input-dark" type="password" placeholder="Password" id="password"/>
+            </div>
+            <div class="col-md-auto">
+              <button class="btn btn-success btn-sm">Sign In</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </nav>
+    <div class="alert alert-danger text-center floating-alert loginMessage" role="alert">
+        Invalid credentials! Please try again.
+      </div>
+      <div class="alert alert-danger text-center floating-alert signupMessage" role="alert">
+        A user with these credentials already exists.
+      </div>
+      <div class="container py-md-5">
+          <div class="row align-items-center">
+            <div class="col-lg-7 py-3 py-md-5">
+              <h1 class="display-3">Remember Writing?</h1>
+              <p class="lead text-muted">Are you sick of short tweets and impersonal &ldquo;shared&rdquo; posts that are reminiscent of the late 90&rsquo;s email forwards? We believe getting back to actually writing is the key to enjoying the internet again.</p>
+            </div>
+            <div class="col-lg-5 pl-lg-5 pb-3 py-lg-5">
+              <form id="signup">
+                <div class="form-group">
+                  <label for="name-register" class="text-muted mb-1">
+                    <small>Name</small>
+                  </label>
+                  <input id="name-register" name="name" class="form-control" type="text" placeholder="Your name..."  />
+                </div>
+                <div class="form-group">
+                  <label for="username-register" class="text-muted mb-1">
+                    <small>Username</small>
+                  </label>
+                  <input id="username-register" name="username" class="form-control" type="text" placeholder="Pick a username"  />
+                </div>
+                <div class="form-group">
+                  <label for="email-register" class="text-muted mb-1">
+                    <small>Email</small>
+                  </label>
+                  <input id="email-register" name="email" class="form-control" type="email" placeholder="you@example.com"  />
+                </div>
+                <div class="form-group">
+                  <label for="password-register" class="text-muted mb-1">
+                    <small>Password</small>
+                  </label>
+                  <input id="password-register" name="password" class="form-control" type="password" placeholder="Create a password" />
+                </div>
+                <button type="submit" class="py-1 mt-4 btn btn-lg btn-success btn-block">
+                  Sign up 
+                </button>
+              </form>
+            </div>
+          </div>
+         
+        </div>
+
+    <footer class="border-top text-center small text-muted py-3">
+        <p><a href="/" class="mx-1">Home</a> | <a class="mx-1" href="/about-us">About Us</a> | <a class="mx-1" href="/terms">Terms</a></p>
+        <p class="m-0">Copyright &copy; 2021 <a href="/" class="text-muted">MyApp</a>. All rights reserved.</p>
+      </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="/js/<%=page%>.js"></script>
+    </body>
+    </html>
+    
