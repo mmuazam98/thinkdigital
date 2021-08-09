@@ -1,20 +1,11 @@
 const Router = require("express").Router();
-const mysql = require("mysql");
+const con = require("../database/database");
 const util = require("util");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const shortid = require("shortid");
 const auth = require("../middleware/auth");
 Router.use(cookieParser());
-
-// CONNECT TO YOUR SQL
-const con = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: "",
-  database: process.env.DB_NAME,
-});
-con.connect();
 
 // FUNCTION TO PARSE YOUR SQL RESPONSES
 const parseData = (x) => {
@@ -24,7 +15,7 @@ const parseData = (x) => {
 const query = util.promisify(con.query).bind(con);
 
 Router.get("/", async (req, res) => {
-  const myquery = "SELECT * FROM `userdetails` WHERE username='mm9084'";
+  const myquery = "SELECT * FROM `userdetails` WHERE username='kunalkka'";
   //   con.query(myquery, (err, results) => {
   //     if (err) throw new Error();
   //     console.log(parseData(results));

@@ -1,5 +1,5 @@
 const Router = require("express").Router();
-const mysql = require("mysql");
+const con = require("../database/database");
 const util = require("util");
 const cookieParser = require("cookie-parser");
 const shortid = require("shortid");
@@ -7,13 +7,6 @@ const auth = require("../middleware/auth");
 const { parse } = require("dotenv");
 Router.use(cookieParser());
 
-const con = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: "",
-  database: process.env.DB_NAME,
-});
-con.connect();
 // FUNCTION TO PARSE YOUR SQL RESPONSES
 const parseData = (x) => {
   return JSON.parse(JSON.stringify(x));
@@ -32,7 +25,7 @@ Router.post("/post", auth, async (req, res) => {
     const response = await query(createPost);
     console.log(response);
     if (response.affectedRows > 0) {
-      res.status(201).json({ msg: "Post created successfully" });
+      res.status(201).json({ msg: "Post created successfully" , postid});
     } else throw new Error();
   } catch (e) {
     res.status(400).json({ msg: "An error occured. Please try again later." });
@@ -51,20 +44,38 @@ Router.get("/posts", auth, async (req, res) => {
 });
 
 Router.get("/post/:id", auth, async (req, res) => {
-  const getPost = `SELECT * FROM posts WHERE userid='${req.user.userid}' AND postid='${req.params.id}'`
-  const getComment = `SELECT comments.userid, comments.postid, comments.commentid, comments.commented, comments.commenttime, userdetails.name FROM comments 
-   LEFT JOIN userdetails ON comments.userid = userdetails.userid WHERE comments.postid = '${req.params.id}'`;
- 
+  const postid = req.params.id;
+  const getPost = `SELECT userdetails.name,posts.* FROM userdetails LEFT JOIN posts ON userdetails.userid = posts.userid WHERE postid='${postid}'`;
+  const getComments = `SELECT userdetails.userid, userdetails.name, comments.* FROM userdetails
+   LEFT JOIN comments ON userdetails.userid = comments.userid WHERE comments.postid='${postid}' ORDER BY comments.commenttime DESC; `;
+  const getLikes = `SELECT userdetails.userid, userdetails.username, userdetails.name, likes.* FROM userdetails
+  LEFT JOIN likes ON likes.userid = userdetails.userid WHERE postid='${postid}';`;
   try {
-    const commentResponse = await query(getComment);
-    const comment = parseData(commentResponse);
-    const postResponse = await query(getPost);
-    const postDetails = parseData(postResponse);
-    res.status(200).send({postDetails: postDetails, comments: comment});
+    const response = await query(getPost);
+    const post = parseData(response)[0];
+    let comments = await query(getComments);
+    let likes = await query(getLikes);
+    comments = parseData(comments);
+    res.status(200).json({ post, comments, likes: likes.length });
   } catch (e) {
     res.status(400).json({ msg: "An error occured. Please try again later." });
   }
 });
+
+Router.post("/post/:postid/likes", auth, async (req, res) => {
+  const postid = req.params.postid;
+  const getLikes = `SELECT userdetails.userid, userdetails.username, userdetails.name, likes.* FROM userdetails
+  LEFT JOIN likes ON likes.userid = userdetails.userid WHERE postid='${postid}';`;
+  try {
+    const response = await query(getLikes);
+    if(response) {
+      res.status(200).send({response})
+    } else throw new Error();
+  } catch (error) {
+    res.status(400).json({msg: error})
+  }
+});
+
 Router.delete("/post", auth, async (req, res) => {
   const { postid } = req.body;
   const deletePost = `DELETE FROM posts WHERE postid='${postid}'`;
