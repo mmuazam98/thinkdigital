@@ -1,19 +1,11 @@
 const Router = require("express").Router();
-const mysql = require("mysql");
+const con = require(".../database/database")
 const util = require("util");
 const cookieParser = require("cookie-parser");
 const shortid = require("shortid");
 const auth = require("../middleware/auth");
 const { parse } = require("dotenv");
 Router.use(cookieParser());
-
-const con = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: "",
-    database: process.env.DB_NAME,
-  });
-con.connect();
 
 const parseData = (x) => {
     return JSON.parse(JSON.stringify(x));
