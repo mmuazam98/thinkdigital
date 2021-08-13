@@ -1,151 +1,52 @@
 const Router = require("express").Router();
-const mysql = require("mysql");
 const util = require("util");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-const shortid = require("shortid");
 const auth = require("../middleware/auth");
+const con = require("../database/database");
 Router.use(cookieParser());
 
-// CONNECT TO YOUR SQL
-const con = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: "",
-  database: process.env.DB_NAME,
-});
-con.connect();
-
-// FUNCTION TO PARSE YOUR SQL RESPONSES
 const parseData = (x) => {
   return JSON.parse(JSON.stringify(x));
 };
-// HANDLE PROMISES
+const convert = (datetime) => {
+  let created_date = new Date(datetime);
+  let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  let year = created_date.getFullYear();
+  let month = months[created_date.getMonth()];
+  let date = created_date.getDate();
+
+  let time = date + ", " + month + " " + year;
+  return time;
+};
 const query = util.promisify(con.query).bind(con);
-
 Router.get("/", async (req, res) => {
-  const myquery = "SELECT * FROM `userdetails` WHERE username='mm9084'";
-  //   con.query(myquery, (err, results) => {
-  //     if (err) throw new Error();
-  //     console.log(parseData(results));
-  //     res.end();
-  //   });
-  const results = await query(myquery);
-  console.log(parseData(results));
-  res.end();
+  res.render("index", { page: "index" });
 });
 
-Router.post("/test", (req, res) => {
-  const payload = req.body;
-  //GENERATE A TOKEN USING JWT.SIGN
-  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
-  //STRORE THE TOKEN IN COOKIE
-  res.cookie("jwtToken", token, { httpOnly: true });
-  res.json({ payload, token });
-});
-
-Router.get("/home", auth, (req, res) => {
-  // GET THE TOKEN FROM COOKIE
-  const token = req.cookies.jwtToken;
-  // CHECK IF IT EXISTS OR NOT
-  if (!token) return res.status(401).json({ msg: "No token, please authorize" });
-  //INCASE IT DOES EXIST
+Router.get("/home", auth, async (req, res) => {
+  console.log(req.user);
+  const getPosts = `SELECT userdetails.username,userdetails.name,posts.* FROM userdetails LEFT JOIN posts ON posts.userid=userdetails.userid WHERE posts.postid IS NOT NULL; `;
   try {
-    // DECODE THE TOKEN USING JSON.VERIFY
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    // DECODED TOKEN WILL BE STORE IN VARIABLE WITH ALL THE DECRYPTED VALUES THAT WERE ENCRYPTED IN JWT.SIGN
-    res.status(200).json({ msg: "Token verified", decodedToken });
+    const response = await query(getPosts);
+    let posts = parseData(response);
+    posts.forEach((post) => {
+      post.createdAt = convert(post.createdAt);
+    });
+    res.render("home", { user: req.user, page: "home", posts });
   } catch (err) {
-    res.status(400).json({ msg: "Your token has expired. Please login again" });
+    res.status(400);
   }
 });
-
-// SIGNUP ROUTE
-Router.post("/signup", async (req, res) => {
-  // USE DESTRUCTURING TO GET VALUES FROM POSTMAN
-  const { name, username, email, password, age } = req.body;
-  // GENERATE A UNIQUE ID
-  const userid = shortid.generate();
-
-  // QUERY FOR CHECKING UNIQUENESS OF EMAIL
-  const checkEmail = `SELECT * FROM userdetails WHERE email='${email}'`;
-  // QUERY FOR CHECKING UNIQUENESS OF USERNAME
-  const checkUsername = `SELECT * FROM userdetails WHERE username='${username}'`;
-  try {
-    // EXECUTE THE ABOVE MENTIONED QUERIES
-    const check1 = await query(checkEmail);
-    const check2 = await query(checkUsername);
-    //CHECK IF THE EMAIL AND USERNAME ARE UNIQUE
-    if (parseData(check1).length == 0 && parseData(check2).length == 0) {
-      // SIGNUP QUERY
-      const signup = `INSERT INTO userdetails (userid,name,username,email,password,age) VALUES ('${userid}','${name}','${username}','${email}','${password}','${age}')`;
-      // EXECUTE THE SIGNUP QUERY
-      const response = await query(signup);
-      // CHECK THE NUMBER OF AFFECTED ROWS
-      if (response.affectedRows > 0) {
-        res.status(201).json({ msg: "User created successfully" });
-      }
-    } else {
-      res.status(400).json({ msg: "already exists" });
-    }
-    // res.json({ check1, check2 });
-  } catch (err) {
-    res.status(400).json({ msg: "An error occured" });
-  }
+Router.get("/create", auth, async (req, res) => {
+  res.render("create", { user: req.user, page: "create" });
 });
-
-// LOGIN ROUTE
-Router.post("/login", async (req, res) => {
-  // GET VALUES FROM POSTMAN
-  const { user, password, type } = req.body;
-  // type 0 - email || type 1 - username
-  try {
-    // CHECK TYPE
-    if (type == 0) {
-      //EMAIL LOGIN
-      // EMAIL LOGIN QUERY
-      const login = `SELECT password FROM userdetails WHERE email='${user}'`;
-      const response = await query(login);
-      // TASK 1: COMPLETE THIS PART i.e COMPLETE THE JWT.SIGN AND COOKIE PART HERE AS WELL
-      // res.json({ response });
-
-      const userdetails = parseData(response)[0];
-      if (userdetails.password === password) {
-        const payload = { userdetails };
-        const token = jwt.sign({ payload }, process.env.JWT_SECRET, { expiresIn: "1d" });
-        res.cookie("jwtToken", token, { httpOnly: true });
-        res.status(200).json({ message: "Email login successful" });
-      } else {
-        throw new Error();
-      }
-    } else {
-      //USERNAME LOGIN
-      // USERNAME LOGIN QUERY
-      const login = `SELECT * FROM userdetails WHERE username='${user}'`;
-      const response = await query(login);
-      console.log(parseData(response));
-      // STORE THE USERDETAILS IN VARIABLE FOR EASY ACCESS
-      const userdetails = parseData(response)[0];
-      // COMPARE PASSWORD
-      if (userdetails.password === password) {
-        // STORE USERDETAILS IN PAYLOAD
-        const payload = { userdetails };
-        // GENERATE TOKEN
-        const token = jwt.sign({ payload }, process.env.JWT_SECRET, { expiresIn: "1d" });
-        //STORE TOKEN IN COOKIE
-        res.cookie("jwtToken", token, { httpOnly: true }); //maxAge: 60000,
-        res.status(200).json({ message: "Username Login successful" });
-      } else {
-        throw new Error();
-      }
-    }
-  } catch (e) {
-    res.status(401).json({ message: "Invalid credentials" });
-  }
+Router.get("/search", auth, async (req, res) => {
+  res.render("search", { user: req.user, page: "search" });
 });
-
-Router.post("/logout", auth, async (req, res) => {
-  res.clearCookie("jwtToken");
-  res.status(200).json({ msg: "Logged out successfully" });
+Router.get("/terms", auth, async (req, res) => {
+  res.render("terms", { user: req.user, page: "terms" });
+});
+Router.get("/about", auth, async (req, res) => {
+  res.render("about", { user: req.user, page: "about" });
 });
 module.exports = Router;

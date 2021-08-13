@@ -1,0 +1,43 @@
+<%- include("partials/headerLoggedIn") %> 
+  <div class="container container--narrow py-5">
+    <div class="d-flex justify-content-between">
+      <h2 class="title-content"><%= post.title %> </h2>
+      <% if (post.userid===user.userid) { %>
+        <span class="pt-2">
+            <span class="edit-post text-primary me-2 action" title="Edit"><i class="fas fa-edit"></i></span>
+            <span class="delete-post text-danger action" title="Delete"><i class="fas fa-trash"></i></span>
+        </span>
+      <% } %>
+     
+    </div>
+
+    <p class="text-muted small mb-4 postAuthor">
+      <a href="/users/<%= post.userid %>?tab=posts">
+        <img class="avatar-tiny" src="/images/user.png" />
+      </a>
+      Posted by <a href="/users/<%= post.userid %>?tab=posts"><%= post.username %> </a> on <%= post.createdAt %> 
+    </p>
+
+    <div class="body-content">
+      <%= post.description %> 
+    </div>
+    <div class="comments border-top my-3 py-3">
+      <h5 class="comments-title">Comments (<%= comments.length %>)</h5>
+      <div class="mb-3">
+        <textarea class="form-control" id="comment" rows="2" placeholder="Post a comment..." autocomplete="off"></textarea>
+        <button class="btn btn-success mt-2" id="btn-comment">Post</button>
+      </div>
+      <% comments.forEach(comment => { %>
+        <div class="comment">
+          <img src="/images/user.png" alt="user" class="avatar-tiny">
+          <a href="/users/<%= comment.userid %>" class="text-primary"><%= comment.name %> </a>
+          <span class="text-muted postedAt"><%= comment.postedAt %> </span>
+          <% if (post.userid===user.userid||comment.userid===user.userid) { %>
+            <span class="text-danger delete-comment" data-id="<%= comment.commentid %>"><i class="fas fa-trash-alt"></i></span>
+          <% } %>
+          <p class="comment--aligned"><%= comment.comment %></p> 
+        </div>
+      <% }) %>
+    </div>
+  </div>
+<%- include("partials/footer") %> 

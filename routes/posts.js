@@ -1,45 +1,58 @@
 const Router = require("express").Router();
-const mysql = require("mysql");
 const util = require("util");
 const cookieParser = require("cookie-parser");
 const shortid = require("shortid");
 const auth = require("../middleware/auth");
-const { parse } = require("dotenv");
+const con = require("../database/database");
+require("dotenv").config();
 Router.use(cookieParser());
 
-const con = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: "",
-  database: process.env.DB_NAME,
-});
-con.connect();
-// FUNCTION TO PARSE YOUR SQL RESPONSES
 const parseData = (x) => {
   return JSON.parse(JSON.stringify(x));
 };
-// HANDLE PROMISES
-const query = util.promisify(con.query).bind(con);
 
+const query = util.promisify(con.query).bind(con);
+const convert = (datetime) => {
+  let created_date = new Date(datetime);
+  let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  let year = created_date.getFullYear();
+  let month = months[created_date.getMonth()];
+  let date = created_date.getDate();
+  let time = date + ", " + month + " " + year;
+  return time;
+};
+const calculateDifference = (datetime) => {
+  const date1 = new Date(datetime);
+  const date2 = new Date();
+  const diffTime = Math.abs(date2 - date1);
+  const diffMin = Math.floor(diffTime / (1000 * 60));
+  const diffHrs = Math.floor(diffTime / (1000 * 60 * 60));
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  if (diffDays <= 1)
+    if (diffMin < 60) return diffMin + "m";
+    else return diffHrs + "h";
+  else if (diffDays < 7) return diffDays + "d";
+  else return Math.floor(diffDays / 7) + "w";
+};
+// create a post
 Router.post("/post", auth, async (req, res) => {
   const userid = req.user.userid;
   const postid = shortid.generate();
   const { title, description } = req.body;
-
   const createPost = `INSERT INTO posts (userid,postid,title,description) VALUES ('${userid}','${postid}','${title}','${description}')`;
-
   try {
     const response = await query(createPost);
     console.log(response);
     if (response.affectedRows > 0) {
-      res.status(201).json({ msg: "Post created successfully" });
+      res.status(201).json({ msg: "Post created successfully", postid });
     } else throw new Error();
   } catch (e) {
     res.status(400).json({ msg: "An error occured. Please try again later." });
   }
 });
 
-Router.get("/posts", auth, async (req, res) => {
+// get my posts
+Router.get("/posts/me", auth, async (req, res) => {
   const getPosts = `SELECT * FROM posts WHERE userid='${req.user.userid}'`;
   try {
     const response = await query(getPosts);
@@ -50,46 +63,100 @@ Router.get("/posts", auth, async (req, res) => {
   }
 });
 
-Router.get("/post/:id", auth, async (req, res) => {
-  const getPost = `SELECT * FROM posts WHERE userid='${req.user.userid}' AND postid='${req.params.id}'`;
+// get posts by a user
+Router.get("/posts/:id", auth, async (req, res) => {
+  const getPosts = `SELECT * FROM posts WHERE userid='${req.params.id}' ORDER BY posts.createdAt DESC`;
   try {
-    const response = await query(getPost);
-    const post = parseData(response);
-    res.status(200).send(post);
+    const response = await query(getPosts);
+    const posts = parseData(response);
+    res.status(200).send(posts);
   } catch (e) {
     res.status(400).json({ msg: "An error occured. Please try again later." });
-  }
-});
-Router.delete("/post", auth, async (req, res) => {
-  const { postid } = req.body;
-  const deletePost = `DELETE FROM posts WHERE postid='${postid}'`;
-  try {
-    const response = await query(deletePost);
-    res.send(response);
-  } catch (e) {
-    res.status(400).json({ msg: "An error occured. Please try again later." });
-  }
-});
-Router.patch("/post", auth, async (req, res) => {
-  const { postid } = req.body;
-  const getPost = `SELECT * FROM posts WHERE postid='${postid}'`;
-  console.log(getPost);
-  try {
-    const response = await query(getPost);
-    const post = parseData(response)[0];
-    res.json({ ...post, ...req.body });
-  } catch (e) {
-    res.status(400).send();
   }
 });
 
-// const a = {
-//   name: "Muazam",
-//   age: 17,
-// };
-// const b = {
-//   age: 20,
-// };
-// const c = { ...a, ...b };
-// console.log(c);
+// get a post & it's comments
+Router.get("/post/:id", auth, async (req, res) => {
+  const postid = req.params.id;
+  const getPost = `SELECT userdetails.name,userdetails.username,posts.* FROM userdetails LEFT JOIN posts ON userdetails.userid = posts.userid WHERE postid='${postid}'`;
+  const getComments = `SELECT userdetails.userid, userdetails.name, comments.* FROM userdetails
+   LEFT JOIN comments ON userdetails.userid = comments.userid WHERE comments.postid='${postid}' ORDER BY comments.postedAt DESC; `;
+  try {
+    const response = await query(getPost);
+    let post = parseData(response)[0];
+    let comments = await query(getComments);
+    comments = parseData(comments);
+    post.createdAt = convert(post.createdAt);
+    comments.forEach((comment) => {
+      comment.postedAt = calculateDifference(comment.postedAt);
+    });
+    // res.status(200).json({ post, comments });
+
+    res.render("post", { page: "post", user: req.user, post, comments });
+  } catch (e) {
+    res.status(400).json({ msg: "An error occured. Please try again later." });
+  }
+});
+
+// delete a post
+Router.delete("/post/:postid", auth, async (req, res) => {
+  const { postid } = req.params;
+  const deletePost = `DELETE FROM posts WHERE postid='${postid}' AND userid='${req.user.userid}'`;
+  try {
+    const response = await query(deletePost);
+    console.log(response);
+    if (response.affectedRows > 0) res.status(200).json({ msg: "Post deleted successfully" });
+  } catch (e) {
+    res.status(400).json({ msg: "An error occured. Please try again later." });
+  }
+});
+// edit post route
+Router.get("/post/:id/edit", auth, async (req, res) => {
+  const postid = req.params.id;
+  const getPost = `SELECT * FROM posts WHERE postid='${postid}' AND userid='${req.user.userid}'`;
+  try {
+    const response = await query(getPost);
+    const { title, description } = response[0];
+    res.render("create", { user: req.user, page: "create", title, description });
+  } catch (err) {
+    res.status(400).json();
+  }
+});
+// update a post
+Router.patch("/post/:id", auth, async (req, res) => {
+  const postid = req.params.id;
+  req.body.postid = postid;
+  const getPost = `SELECT * FROM posts WHERE postid='${postid}' AND userid='${req.user.userid}'`;
+  try {
+    const response = await query(getPost);
+    const post = parseData(response)[0];
+    const updatedPost = { ...post, ...req.body };
+    if (updatedPost.userid === req.user.userid) {
+      const { title, description } = updatedPost;
+      const updatePost = `UPDATE posts SET title='${title}',description='${description}' WHERE postid='${postid}' AND userid='${req.user.userid}'`;
+      const data = await query(updatePost);
+      if (data.affectedRows > 0) res.status(200).json({ msg: "Post updated successfully.", postid });
+    } else return new Error();
+  } catch (e) {
+    res.status(400).json({ msg: "An error occured" });
+  }
+});
+
+// search
+Router.post("/search", auth, async (req, res) => {
+  const searchQuery = req.body.query;
+  const searchPost = `SELECT userdetails.name,userdetails.username,posts.* FROM userdetails LEFT JOIN posts ON userdetails.userid = posts.userid WHERE title LIKE '%${searchQuery}%' OR description LIKE '%${searchQuery}%'`;
+  const searchUser = `SELECT userdetails.* FROM userdetails WHERE username LIKE '%${searchQuery}%' OR name LIKE '%${searchQuery}%'`;
+  try {
+    let posts = await query(searchPost);
+    let users = await query(searchUser);
+    posts.forEach((post) => {
+      console.log(post.createdAt);
+      post.createdAt = convert(post.createdAt);
+    });
+    res.json({ posts, users });
+  } catch (err) {
+    res.status(400).json();
+  }
+});
 module.exports = Router;

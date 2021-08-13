@@ -1,0 +1,21 @@
+<%- include("partials/headerLoggedIn") %> 
+<div class="container container--narrow py-5">
+    <form id="create-post">
+      <div class="form-group">
+        <label for="post-title" class="text-muted mb-1">
+          <small>Title</small>
+        </label>
+        <input autofocus name="title" id="post-title" class="form-control form-control-lg form-control-title" type="text" placeholder="" required autocomplete="off" value="<%= typeof title!=='undefined' ? title :"" %>" />
+      </div>
+
+      <div class="form-group">
+        <label for="post-body" class="text-muted mb-1 d-block">
+          <small>Body Content</small>
+        </label>
+        <textarea name="body" id="post-body" class="body-content tall-textarea form-control" type="text" required ><%= typeof description!=='undefined' ? description :"" %></textarea>
+      </div>
+
+      <button class="btn btn-success mt-3" id="submit-btn">Share</button>
+    </form>
+  </div>
+<%- include("partials/footer") %> 
