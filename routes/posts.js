@@ -13,6 +13,30 @@ const parseData = (x) => {
 
 const query = util.promisify(con.query).bind(con);
 
+const convert = (datetime) => {
+  let created_date = new Date(datetime);
+  let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  let year = created_date.getFullYear();
+  let month = months[created_date.getMonth()];
+  let day = created_date.getDate();
+  let date = `${day}, ${month} ${year}`;
+  return date;
+};
+
+const calculateDifference = (datetime) => {
+  const date1 = new Date(datetime);
+  const date2 = new Date();
+  const diffTime = Math.abs(date1 - date2);
+  const diffMin = Math.floor(diffTime / (1000 * 60));
+  const diffHrs = Math.floor(diffTime / (1000 * 60 * 60));
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  if (diffDays <= 1) {
+    if (diffMin < 60) return diffMin + "m";
+    else return diffHrs + "h";
+  } else if (diffDays < 7) return diffDays + "d";
+  else return Math.floor(diffDays / 7) + "w";
+};
+
 // create a post
 Router.post("/post", auth, async (req, res) => {
   const userid = req.user.userid;
@@ -45,21 +69,20 @@ Router.get("/posts/:id", auth, async (req, res) => {
 // get a post & it's comments
 Router.get("/post/:id", auth, async (req, res) => {
   const postid = req.params.id;
+  console.log(postid);
   const getPost = `SELECT userdetails.name,userdetails.username,posts.* FROM userdetails LEFT JOIN posts ON userdetails.userid = posts.userid WHERE postid='${postid}'`;
-  const getComments = `SELECT userdetails.userid, userdetails.name, comments.* FROM userdetails
-   LEFT JOIN comments ON userdetails.userid = comments.userid WHERE comments.postid='${postid}' ORDER BY comments.postedAt DESC; `;
+  const getComments = `SELECT userdetails.userid,userdetails.name, comments.* FROM userdetails LEFT JOIN comments ON userdetails.userid = comments.userid WHERE 
+  comments.postid='${postid}' ORDER BY postedAt DESC; `;
   try {
     const response = await query(getPost);
     let post = parseData(response)[0];
     let comments = await query(getComments);
-    comments = parseData(comments);
-    post.createdAt = convert(post.createdAt);
     comments.forEach((comment) => {
       comment.postedAt = calculateDifference(comment.postedAt);
     });
-    // res.status(200).json({ post, comments });
-
-    res.render("post", { page: "post", user: req.user, post, comments });
+    console.log(comments);
+    post.createdAt = convert(post.createdAt);
+    res.status(200).json({ post, comments });
   } catch (e) {
     res.status(400).json({ msg: "An error occured. Please try again later." });
   }
@@ -108,6 +131,22 @@ Router.patch("/post/:id", auth, async (req, res) => {
     } else return new Error();
   } catch (e) {
     res.status(400).json({ msg: "An error occured" });
+  }
+});
+
+Router.post("/search", auth, async (req, res) => {
+  const searchQuery = req.body.query;
+  const searchPost = `SELECT userdetails.username,userdetails.name,posts.* FROM userdetails LEFT JOIN posts ON userdetails.userid=posts.userid WHERE title LIKE '%${searchQuery}%' OR description LIKE '%${searchQuery}%'; `;
+  const searchUser = `SELECT * FROM userdetails WHERE username LIKE '%${searchQuery}%' OR name LIKE '%${searchQuery}%'`;
+  try {
+    let posts = await query(searchPost);
+    let users = await query(searchUser);
+    posts.forEach((post) => {
+      post.createdAt = convert(post.createdAt);
+    });
+    res.json({ posts, users });
+  } catch (err) {
+    res.status(400);
   }
 });
 
