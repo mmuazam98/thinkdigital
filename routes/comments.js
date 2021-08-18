@@ -32,16 +32,15 @@ Router.post("/comment/:id", auth, async (req, res) => {
   }
 })
 
-Router.delete("/comment/:commentid", auth, async (req, res) => {
+Router.delete("/comment/:postid/:commentid", auth, async (req, res) => {
   const commentid = req.params.commentid;
-
+  const postid = req.params.postid;
   const getComment = `SELECT * FROM comments WHERE commentid='${commentid}'`;
+  const getPostOwner = `SELECT * FROM posts WHERE postid='${postid}'`;
   const deleteComment = `DELETE FROM comments WHERE commentid='${commentid}'`;
   try {
     const comment = await query(getComment);
-    const postid = comment[0].postid,
-      commentOwner = comment[0].userid;
-    const getPostOwner = `SELECT * FROM posts WHERE postid='${postid}'`;
+    const commentOwner = comment[0].userid;
     const owner = await query(getPostOwner);
     const postOwner = owner[0].userid;
     if (req.user.userid == postOwner || req.user.userid == commentOwner) {

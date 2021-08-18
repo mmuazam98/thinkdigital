@@ -14,6 +14,28 @@ const parseData = (x) => {
 // HANDLE PROMISES
 const query = util.promisify(con.query).bind(con);
 
+const convert = (datetime) => {
+  let created_date = new Date(datetime);
+  let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  let year = created_date.getFullYear();
+  let month = months[created_date.getMonth()];
+  let date = created_date.getDate();
+  let time = date + ", " + month + " " + year;
+  return time;
+}
+const calculateDifference = (datetime) => {
+  const given_date = new Date(datetime);
+  const today_date = new Date();
+  const diffTime = Math.abs(today_date - given_date);
+  const diffMin = Math.floor(diffTime / (1000*60));
+  const diffHrs = Math.floor(diffTime / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  if(diffDays <= 1) 
+    if(diffMin < 60) return diffMin + "m";
+    else return diffHrs + "h";
+  else if(diffDays < 7) return diffDays + "d";
+  else return Math.floor(diffDays / 7) + "w";
+}
 Router.post("/post", auth, async (req, res) => {
   const userid = req.user.userid;
   const postid = shortid.generate();
@@ -32,7 +54,7 @@ Router.post("/post", auth, async (req, res) => {
   }
 });
 
-Router.get("/posts", auth, async (req, res) => {
+Router.get("/posts/me", auth, async (req, res) => {
   const getPosts = `SELECT * FROM posts WHERE userid='${req.user.userid}'`;
   try {
     const response = await query(getPosts);
@@ -47,16 +69,20 @@ Router.get("/post/:id", auth, async (req, res) => {
   const postid = req.params.id;
   const getPost = `SELECT userdetails.name,posts.* FROM userdetails LEFT JOIN posts ON userdetails.userid = posts.userid WHERE postid='${postid}'`;
   const getComments = `SELECT userdetails.userid, userdetails.name, comments.* FROM userdetails
-   LEFT JOIN comments ON userdetails.userid = comments.userid WHERE comments.postid='${postid}' ORDER BY comments.commenttime DESC; `;
+   LEFT JOIN comments ON userdetails.userid = comments.userid WHERE comments.postid='${postid}' ORDER BY comments.commentedAt DESC; `;
   const getLikes = `SELECT userdetails.userid, userdetails.username, userdetails.name, likes.* FROM userdetails
   LEFT JOIN likes ON likes.userid = userdetails.userid WHERE postid='${postid}';`;
   try {
     const response = await query(getPost);
     const post = parseData(response)[0];
+    post.createdAt = convert(post.createdAt);
     let comments = await query(getComments);
+    comments.forEach(comment => {
+      comment.commentedAt = calculateDifference(comment.commentedAt);
+    })
     let likes = await query(getLikes);
     comments = parseData(comments);
-    res.status(200).json({ post, comments, likes: likes.length });
+    res.render("post", { post, comments, likes: likes.length, page: "post", user: req.user });
   } catch (e) {
     res.status(400).json({ msg: "An error occured. Please try again later." });
   }
@@ -76,44 +102,62 @@ Router.post("/post/:postid/likes", auth, async (req, res) => {
   }
 });
 
-Router.delete("/post", auth, async (req, res) => {
-  const { postid } = req.body;
+Router.delete("/post/:postid", auth, async (req, res) => {
+  const { postid } = req.params;
   const deletePost = `DELETE FROM posts WHERE postid='${postid}'`;
   try {
     const response = await query(deletePost);
-    res.send(response);
+    if(response.affectedRows > 0) res.status(200).json({msg: "Post deleted successfully"});
   } catch (e) {
     res.status(400).json({ msg: "An error occured. Please try again later." });
   }
 });
-Router.patch("/post", auth, async (req, res) => {
-  const { postid } = req.body;
-  const userid = req.user.userid;
-  const getPost = `SELECT * FROM posts WHERE postid='${postid}'`;
+
+Router.get("/post/:id/edit", auth, async (req, res) => {
+  const postid = req.params.id;
+  const getPost = `SELECT * FROM posts WHERE postid='${postid}' AND userid='${req.user.userid}'`;
+  try {
+    const response = await query(getPost);
+    const {title, description} = response[0];
+    res.render("create", {user: req.user, page: "create", title, description})
+  } catch (error) {
+    res.status(400).json();
+  }
+})
+
+
+Router.patch("/post/:id", auth, async (req, res) => {
+  const postid = req.params.id;
+  const getPost = `SELECT * FROM posts WHERE postid='${postid}' AND userid='${req.user.userid}'`;
   try {
     const response = await query(getPost);
     const post = parseData(response)[0];
-    if(userid === post.userid){
-      const editedPost = { ...post, ...req.body };
-      const editPost = `UPDATE posts SET title='${editedPost.title}', description='${editedPost.description}' WHERE postid='${postid} AND userid='${userid}''`;
-      const editedResponse = await query(editPost);
-      if(editedResponse.affectedRows > 0){
-        res.status(200).json({msg: "Post updated successfully"});
-      } else throw new Error();
-    } else res.status(401).json({msg: "Invalid credentials, editing other user posts not allowed"})
+    const updatedPost = { ...post, ...req.body };
+    if (updatedPost.userid === req.user.userid) {
+      const { title, description } = updatedPost;
+      const updatePost = `UPDATE posts SET title='${title}',description='${description}' WHERE postid='${postid}' AND userid='${req.user.userid}'`;
+      const data = await query(updatePost);
+      if (data.affectedRows > 0) res.status(200).json({ msg: "Post updated successfully.", postid });
+    } else return new Error();
   } catch (e) {
-    res.status(400).send();
+    res.status(400).json({ msg: "An error occured" });
   }
 });
 
-// const a = {
-//   name: "Muazam",
-//   age: 17,
-// };
-// const b = {
-//   age: 20,
-// };
-// const c = { ...a, ...b };
-// console.log(c);
+Router.post("/search", auth, async (req, res) => {
+  const searchQuery = req.body.query;
+  const searchPost = `SELECT userdetails.name,userdetails.username,posts.* FROM userdetails LEFT JOIN posts ON userdetails.userid = posts.userid WHERE title LIKE '%${searchQuery}%' OR description LIKE '%${searchQuery}%'`;
+  const searchUser = `SELECT userdetails.* FROM userdetails WHERE username LIKE '%${searchQuery}%' OR name LIKE '%${searchQuery}%'`;
+  try {
+    let posts = await query(searchPost);
+    let users = await query(searchUser);
+    posts.forEach((post) => {
+      post.createdAt = convert(post.createdAt);
+    });
+    res.json({ posts, users });
+  } catch (err) {
+    res.status(400).json();
+  }
+})
 
 module.exports = Router;

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="/css/main.css">
+    <title>MyApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
+    
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container d-flex flex-column flex-md-row align-items-center px-3 py-2">
+        <h4 class="navbar-brand my-0 mr-md-auto font-weight-normal">
+          <a href="/" class="text-muted">
+            MyApp
+          </a>
+        </h4>
+        <form class="mb-0 pt-2 pt-md-0" id="login">
+          <div class="row align-items-center">
+            <div class="col-md mr-0 pr-md-0 mb-3 mb-md-0">
+              <input name="username" class="form-control form-control-sm input-dark" type="text" placeholder="Username" autocomplete="off" id="user" />
+            </div>
+            <div class="col-md mr-0 pr-md-0 mb-3 mb-md-0">
+              <input name="password" class="form-control form-control-sm input-dark" type="password" placeholder="Password" id="password"/>
+            </div>
+            <div class="col-md-auto">
+              <button class="btn btn-success btn-sm">Sign In</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </nav>

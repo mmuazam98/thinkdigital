@@ -1,0 +1,38 @@
+<%- include("partials/headerLoggedIn") %> 
+<div class="container container--narrow py-md-5">
+    <h2>
+      <img class="avatar-small" src="/images/user.png" /> <span id="username"><%= profile.username %></span> 
+      <% if (!profile.isCurrentUser) { %>
+        <% if (!profile.isFollowing) { %> 
+          <button class="btn btn-primary btn-sm ml-2 followUser" data-id="<%= profile.userid %>">Follow <i class="fas fa-user-plus"></i></button>
+        <% } %>
+        <% if (profile.isFollowing) { %> 
+          <button class="btn btn-danger btn-sm ml-2 unfollowUser" data-id="<%= profile.userid %>">Stop Following <i class="fas fa-user-times"></i></button>
+        <% } %>
+      <% } %>
+      <p class="name"><%= profile.name %> </p>
+    </h2>
+
+    <div class="profile-nav nav nav-tabs pt-2 mb-4">
+      <a href="/users/<%= profile.userid %>?tab=posts" class=" nav-item nav-link" id="postsTab">
+        Posts: <span id="posts">-</span>
+      </a>
+      <a href="/users/<%= profile.userid %>?tab=followers" class="nav-item nav-link" id="followersTab">
+        Followers: <span id="followers">-</span>
+      </a>
+      <a href="/users/<%= profile.userid %>?tab=following" class="nav-item nav-link" id="followingTab">
+        Following: <span id="following">-</span>
+      </a>
+    </div>
+
+    <div class="list-group posts">
+      
+    </div>
+    <div class="list-group followers">
+        
+    </div>
+    <div class="list-group following">
+        
+    </div>
+  </div>
+<%- include("partials/footer") %> 
