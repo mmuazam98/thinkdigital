@@ -97,7 +97,7 @@ Router.post("/login", async (req, res) => {
     // CHECK TYPE
     if (type == 0) {
       //EMAIL LOGIN
-      // EMAIL LOGIN QUERY
+      
       const login = `SELECT password FROM userdetails WHERE email='${user}'`;
       const response = await query(login);
       // TASK 1: COMPLETE THIS PART i.e COMPLETE THE JWT.SIGN AND COOKIE PART HERE AS WELL
