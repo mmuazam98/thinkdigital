@@ -179,11 +179,12 @@ nav .avatar-tiny {
 #like-btn:hover{
   transform: scale(1.05);
   color: red;
-  text-shadow: none;
+  text-shadow: 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
 }
 
 #like-btn.liked{
   color: red;
+  text-shadow: 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
 }
 
 #like-count{
