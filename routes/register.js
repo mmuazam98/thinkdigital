@@ -1,3 +1,4 @@
+console.log("test database.js")
 const Router = require("express").Router();
 const con = require("../database/database");
 const util = require("util");
@@ -13,27 +14,6 @@ const parseData = (x) => {
 };
 // HANDLE PROMISES
 const query = util.promisify(con.query).bind(con);
-
-Router.get("/", async (req, res) => {
-  const myquery = "SELECT * FROM `userdetails` WHERE username='kunalkka'";
-  //   con.query(myquery, (err, results) => {
-  //     if (err) throw new Error();
-  //     console.log(parseData(results));
-  //     res.end();
-  //   });
-  const results = await query(myquery);
-  console.log(parseData(results));
-  res.end();
-});
-
-Router.post("/test", (req, res) => {
-  const payload = req.body;
-  //GENERATE A TOKEN USING JWT.SIGN
-  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
-  //STRORE THE TOKEN IN COOKIE
-  res.cookie("jwtToken", token, { httpOnly: true });
-  res.json({ payload, token });
-});
 
 Router.get("/home", auth, (req, res) => {
   // GET THE TOKEN FROM COOKIE

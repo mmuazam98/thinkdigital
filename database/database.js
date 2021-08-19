@@ -1,4 +1,6 @@
+console.log("test database.js")
 const mysql = require("mysql");
+
 require("dotenv").config();
 
 const con = mysql.createConnection({
