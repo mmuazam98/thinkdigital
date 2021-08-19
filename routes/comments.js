@@ -16,10 +16,11 @@ const query = util.promisify(con.query).bind(con);
 
 Router.post("/comment/:id", auth, async (req, res) => {
   const userid = req.user.userid;
+  const postid = req.params.id;
   const commentid = shortid.generate();
   const {commented} = req.body;
 
-  const createComment = `INSERT INTO comments (userid, postid, commentid, commented) VALUES ('${userid}', '${req.params.id}', '${commentid}', '${commented}');`;
+  const createComment = `INSERT INTO comments (userid, postid, commentid, commented) VALUES ('${userid}', '${postid}', '${commentid}', '${commented}');`;
   
   try {
     const response = await query(createComment);

@@ -43,6 +43,7 @@ Router.get("/users/:id", auth, async (req, res) => {
       response.isCurrentUser = true;
       res.render("profile", { page: "profile", user: req.user, profile: req.user });
     } else {
+      const getPosts = `SELECT * FROM posts WHERE userid='${id}'`
       const getProfile = `SELECT * FROM userdetails WHERE userid='${id}'`;
       const checkFollowing = `SELECT * FROM followers WHERE followingid='${req.user.userid}' AND followerid='${id}'`;
       try {

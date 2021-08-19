@@ -4,7 +4,15 @@
     <div class="list-group">
     <% posts.forEach(post => { %>
         <a href="/post/<%= post.postid %>" class="list-group-item list-group-item-action">
-        <img class="avatar-tiny" src="/images/user.png" /> <strong><%= post.title %></strong>
+        <img class="avatar-tiny" src="/images/user.png" /> <strong><%= post.title %> | </strong>
+        <i class="fas fa-heart <% if (post["isLikedByUser"]) { %>
+          liked
+         <% } %> "></i>
+         <% if (post.likes===0) { %>
+          (0)
+         <% } else { %>
+           (<%= post.likes %>) 
+         <% } %>
         <span class="text-muted small">by <%= post.username %> on <%= post.createdAt %> </span>
         </a>
     <% }) %> 

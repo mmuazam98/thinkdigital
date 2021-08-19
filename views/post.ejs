@@ -1,7 +1,9 @@
 <%- include("partials/headerLoggedIn") %> 
   <div class="container container--narrow py-5">
     <div class="d-flex justify-content-between">
-      <h2 class="title-content"><%= post.title %> </h2>
+      <h2 class="title-content"><%= post.title %> | <i class="fas fa-heart <%= likeClass  %>" id="like-btn"></i>
+        <a href="/post/<%= post.postid%>/likes" id="like-count">(<%= likes %>)</a>
+      </h2>
       <% if (post.userid===user.userid) { %>
         <span class="pt-2">
             <span class="edit-post text-primary me-2 action" title="Edit"><i class="fas fa-edit"></i></span>

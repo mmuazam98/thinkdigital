@@ -36,7 +36,7 @@ const calculateDifference = (datetime) => {
   else if(diffDays < 7) return diffDays + "d";
   else return Math.floor(diffDays / 7) + "w";
 }
-Router.post("/post", auth, async (req, res) => {
+Router.post("/post/", auth, async (req, res) => {
   const userid = req.user.userid;
   const postid = shortid.generate();
   const { title, description } = req.body;
@@ -54,8 +54,9 @@ Router.post("/post", auth, async (req, res) => {
   }
 });
 
-Router.get("/posts/me", auth, async (req, res) => {
-  const getPosts = `SELECT * FROM posts WHERE userid='${req.user.userid}'`;
+Router.get("/posts/:id", auth, async (req, res) => {
+  const userid = req.params.id
+  const getPosts = `SELECT * FROM posts WHERE userid='${userid}';`;
   try {
     const response = await query(getPosts);
     const posts = parseData(response);
@@ -67,11 +68,13 @@ Router.get("/posts/me", auth, async (req, res) => {
 
 Router.get("/post/:id", auth, async (req, res) => {
   const postid = req.params.id;
-  const getPost = `SELECT userdetails.name,posts.* FROM userdetails LEFT JOIN posts ON userdetails.userid = posts.userid WHERE postid='${postid}'`;
+  const getPost = `SELECT userdetails.name, userdetails.username,posts.* FROM userdetails LEFT JOIN posts ON userdetails.userid = posts.userid WHERE postid='${postid}'`;
   const getComments = `SELECT userdetails.userid, userdetails.name, comments.* FROM userdetails
    LEFT JOIN comments ON userdetails.userid = comments.userid WHERE comments.postid='${postid}' ORDER BY comments.commentedAt DESC; `;
-  const getLikes = `SELECT userdetails.userid, userdetails.username, userdetails.name, likes.* FROM userdetails
-  LEFT JOIN likes ON likes.userid = userdetails.userid WHERE postid='${postid}';`;
+  const getLikes = `SELECT * FROM likes WHERE postid='${postid}'`;
+  // const getLike = `SELECT * FROM likes WHERE postid = '${postid}' AND userid ='${req.user.userid}'`
+  let isLikedByUser = false;
+  let likeClass = " unliked";
   try {
     const response = await query(getPost);
     const post = parseData(response)[0];
@@ -81,24 +84,45 @@ Router.get("/post/:id", auth, async (req, res) => {
       comment.commentedAt = calculateDifference(comment.commentedAt);
     })
     let likes = await query(getLikes);
+    likes = parseData(likes)
+    const isLiked = likes.filter(like => {
+      return like.userid == req.user.userid;
+    })
+    if(isLiked.length){
+      isLikedByUser = true;
+    }
+    if(isLikedByUser){ likeClass = "liked"};
     comments = parseData(comments);
-    res.render("post", { post, comments, likes: likes.length, page: "post", user: req.user });
+    res.render("post", {likeClass, post, comments, page: "post", user: req.user, isLikedByUser, likes: likes.length});
   } catch (e) {
     res.status(400).json({ msg: "An error occured. Please try again later." });
   }
 });
 
-Router.post("/post/:postid/likes", auth, async (req, res) => {
+Router.get("/post/:postid/likes", auth, async (req, res) => {
   const postid = req.params.postid;
   const getLikes = `SELECT userdetails.userid, userdetails.username, userdetails.name, likes.* FROM userdetails
   LEFT JOIN likes ON likes.userid = userdetails.userid WHERE postid='${postid}';`;
+  const getPost = `SELECT userdetails.name, userdetails.username,posts.* FROM userdetails LEFT JOIN posts ON userdetails.userid = posts.userid WHERE postid='${postid}';`
+  let isLikedByUser = false;
+  let likeClass = "unliked";
   try {
-    const response = await query(getLikes);
-    if(response) {
-      res.status(200).send({response})
+    const resLike = await query(getLikes);
+    const resPost = await query(getPost);
+    const post = parseData(resPost)[0];
+    const likes = parseData(resLike)
+    const isLiked = likes.filter(like => {
+      return like.userid == req.user.userid;
+    })
+    if(isLiked.length){
+      isLikedByUser = true;
+    }
+    if(isLikedByUser){ likeClass = "liked"};
+    if(resLike || resPost) {
+      res.render("likes", { user: req.user, page: "likes", likes, post, isLikedByUser, likeClass });
     } else throw new Error();
   } catch (error) {
-    res.status(400).json({msg: error})
+    res.status(400).json({error})
   }
 });
 

@@ -1,0 +1,43 @@
+<%- include("partials/headerLoggedIn") %>
+<div class="container container--narrow py-5">
+    <div class="d-flex justify-content-between">
+      <h2 class="title-content"><%= post.title %> | <i class="fas fa-heart <%= likeClass  %>" id="like-btn"></i>
+        <a href="/post/<%= post.postid%>/likes" id="like-count">(<%= likes.length %>)</a>
+      </h2>
+      <% if (post.userid===user.userid) { %>
+        <span class="pt-2">
+            <span class="edit-post text-primary me-2 action" title="Edit"><i class="fas fa-edit"></i></span>
+            <span class="delete-post text-danger action" title="Delete"><i class="fas fa-trash"></i></span>
+        </span>
+      <% } %>
+     
+    </div>
+
+    <p class="text-muted small mb-4 postAuthor">
+      <a href="/users/<%= post.userid %>?tab=posts">
+        <img class="avatar-tiny" src="/images/user.png" />
+      </a>
+      Posted by <a href="/users/<%= post.userid %>?tab=posts"><%= post.username %> </a> on <%= post.createdAt %> 
+    </p>
+
+    <div class="body-content">
+      <%= post.description %> 
+    </div>
+    <div class="container">
+        <h2 class="title-content">Liked by</h2>
+        <br />
+        <% likes.forEach(like => { %>
+            <a href="/users/<%=like.userid%>" class="list-group-item list-group-item-action">
+                <img class="avatar-tiny" src="/images/user.png" /> <strong><%=like.name%></strong>
+                <span class="text-muted small"> <%=like.username%> </span>
+            </a>
+        <% }) %>
+    </div>
+    <br />
+    <p class="text-muted small mb-4 postAuthor">
+        <a href="/post/<%= post.postid %>">
+            Go back to post.
+        </a> 
+      </p>
+  </div>
+<%- include("partials/footer") %>  

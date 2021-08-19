@@ -10,7 +10,7 @@ if (editPost || deletePost) {
         const response = await axios.delete(`/post/${postid}`);
         console.log(response);
         if (response.status === 200) {
-          window.location.href = `/users/${localStorage.getItem("userid")}`;
+          window.location.href = `/users/${loggedInUser}`;
         }
       } catch (err) {
         console.log(err);
@@ -50,4 +50,25 @@ if (deleteComment) {
       }
     });
   });
+}
+
+const likePost = document.querySelector("#like-btn") || null;
+const likeCount = document.querySelector("#like-count");
+if(likePost){
+  likePost.addEventListener("click", async() => {
+    try {
+      const response = await axios.post(`/like/${postid}`);
+      likeCount.innerHTML = `(${response.data.likes})`;
+      if(response.data.isLikedByUser == true){
+        likePost.style.color = "red";
+      } 
+      else{
+        likePost.style.color = "#fff"
+      } 
+      
+    } catch (error) {
+      console.log(error)
+    }
+
+  })
 }

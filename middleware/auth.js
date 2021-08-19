@@ -7,7 +7,6 @@ const auth = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded.payload.userdetails;
     delete req.user.password;
-    console.log(req.user);
     next();
   } catch (e) {
     return res.status(400).json({ msg: "Token expired" });

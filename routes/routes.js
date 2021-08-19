@@ -29,11 +29,27 @@ Router.get("/home", auth, async (req, res) => {
   const getPosts = `SELECT userdetails.username,userdetails.name,posts.* FROM userdetails LEFT JOIN posts ON posts.userid=userdetails.userid WHERE posts.postid IS NOT NULL; `;
   try {
     const response = await query(getPosts);
-    let posts = parseData(response);
-    posts.forEach((post) => {
+    const posts = parseData(response);
+
+    posts.forEach(async (post, index) => {
+      
       post.createdAt = convert(post.createdAt);
+      const getLikes = `SELECT userdetails.userid, userdetails.username, userdetails.name, likes.* FROM userdetails
+      LEFT JOIN likes ON likes.userid = userdetails.userid WHERE postid='${post.postid}';`;
+      const getLike = `SELECT * FROM likes WHERE postid = '${post.postid}' AND userid ='${req.user.userid}'`
+      const likes = await query(getLike);
+      const allLikes = await query(getLikes);
+
+      if(likes.length > 0) post["isLikedByUser"] = true;
+      else post["isLikedByUser"] = false
+      post["likes"] = allLikes.length;
+
+      if(index == posts.length - 1){
+        res.render("home", { user: req.user, page: "home", posts });
+      } 
     });
-    res.render("home", { user: req.user, page: "home", posts });
+    if(posts.length === 0) res.render("home", { user: req.user, page: "home", posts });
+
   } catch (err) {
     res.status(400);
   }

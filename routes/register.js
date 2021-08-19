@@ -54,7 +54,8 @@ Router.get("/home", auth, (req, res) => {
 // SIGNUP ROUTE
 Router.post("/signup", async (req, res) => {
   // USE DESTRUCTURING TO GET VALUES FROM POSTMAN
-  const { name, username, email, password, age } = req.body;
+  const { name, username, email, password } = req.body;
+  const userdetails = { name,email,username };
   // GENERATE A UNIQUE ID
   const userid = shortid.generate();
 
@@ -69,11 +70,14 @@ Router.post("/signup", async (req, res) => {
     //CHECK IF THE EMAIL AND USERNAME ARE UNIQUE
     if (parseData(check1).length == 0 && parseData(check2).length == 0) {
       // SIGNUP QUERY
-      const signup = `INSERT INTO userdetails (userid,name,username,email,password,age) VALUES ('${userid}','${name}','${username}','${email}','${password}','${age}')`;
+      const signup = `INSERT INTO userdetails (userid,name,username,email,password) VALUES ('${userid}','${name}','${username}','${email}','${password}')`;
       // EXECUTE THE SIGNUP QUERY
       const response = await query(signup);
       // CHECK THE NUMBER OF AFFECTED ROWS
       if (response.affectedRows > 0) {
+        const payload = { userdetails };
+        const token = jwt.sign({ payload }, process.env.JWT_SECRET, { expiresIn: "1d" });
+        res.cookie("jwtToken", token, { httpOnly: true });
         res.status(201).json({ msg: "User created successfully" });
       }
     } else {

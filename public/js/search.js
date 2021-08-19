@@ -29,7 +29,7 @@ searchInput.addEventListener("keyup", async (e) => {
         if (response.data.users.length > 0) {
           spinner.style.display = "none";
           response.data.users.forEach((user) => {
-            let appendPost = `<a href="/post/${user.userid}" class="list-group-item list-group-item-action">
+            let appendPost = `<a href="/users/${user.userid}" class="list-group-item list-group-item-action">
                 <img class="avatar-tiny" src="/images/user.png" /> <strong>${user.name}</strong>
                 <span class="text-muted small"> ${user.username} </span>
 

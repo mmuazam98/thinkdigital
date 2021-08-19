@@ -34,7 +34,6 @@ const showComponent = () => {
 };
 const fetchPosts = async () => {
   const userid = window.location.pathname.split("/")[2];
-  console.log(userid);
   try {
     const response = await axios.get(`/posts/${userid}`);
     const posts = response.data;
@@ -65,7 +64,6 @@ const fetchFollowers = async () => {
     const response = await axios.get(`/followers/${userid}`);
     const followers = response.data;
     totalFollowers.innerHTML = followers.length;
-    console.log(followers);
     if (followers.length > 0) {
       followers.forEach((follower) => {
         let appendPost = ` <a href="/users/${follower.userid}?tab=posts" class="list-group-item list-group-item-action"> <img class="avatar-tiny" src="/images/user.png" /> ${follower.name} </a>`;
