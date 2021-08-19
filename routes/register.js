@@ -71,6 +71,7 @@ Router.post("/signup", async (req, res) => {
 // LOGIN ROUTE
 Router.post("/login", async (req, res) => {
   // GET VALUES FROM POSTMAN
+  console.log(req.body)
   const { user, password, type } = req.body;
   // type 0 - email || type 1 - username
   try {
@@ -106,6 +107,7 @@ Router.post("/login", async (req, res) => {
         const payload = { userdetails };
         // GENERATE TOKEN
         const token = jwt.sign({ payload }, process.env.JWT_SECRET, { expiresIn: "1d" });
+        console.log(token)
         //STORE TOKEN IN COOKIE
         res.cookie("jwtToken", token, { httpOnly: true }); //maxAge: 60000,
         res.status(200).json({ message: "Username Login successful" });
@@ -114,6 +116,7 @@ Router.post("/login", async (req, res) => {
       }
     }
   } catch (e) {
+    console.log(e);
     res.status(401).json({ message: "Invalid credentials" });
   }
 });
