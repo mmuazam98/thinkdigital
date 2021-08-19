@@ -17,6 +17,4 @@ const con = mysql.createConnection({
 //   });
 // con.connect();
 
-console.log(process.env)
-
 module.exports = con;

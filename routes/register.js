@@ -1,11 +1,10 @@
-console.log("test database.js")
 const Router = require("express").Router();
-const con = require("../database/database");
 const util = require("util");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const shortid = require("shortid");
-const auth = require("../middleware/auth");
+const bcrypt = require("bcryptjs");
+const con = require("../database/database");
 Router.use(cookieParser());
 
 // FUNCTION TO PARSE YOUR SQL RESPONSES
@@ -15,27 +14,11 @@ const parseData = (x) => {
 // HANDLE PROMISES
 const query = util.promisify(con.query).bind(con);
 
-Router.get("/home", auth, (req, res) => {
-  // GET THE TOKEN FROM COOKIE
-  const token = req.cookies.jwtToken;
-  // CHECK IF IT EXISTS OR NOT
-  if (!token) return res.status(401).json({ msg: "No token, please authorize" });
-  //INCASE IT DOES EXIST
-  try {
-    // DECODE THE TOKEN USING JSON.VERIFY
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    // DECODED TOKEN WILL BE STORE IN VARIABLE WITH ALL THE DECRYPTED VALUES THAT WERE ENCRYPTED IN JWT.SIGN
-    res.status(200).json({ msg: "Token verified", decodedToken });
-  } catch (err) {
-    res.status(400).json({ msg: "Your token has expired. Please login again" });
-  }
-});
-
 // SIGNUP ROUTE
 Router.post("/signup", async (req, res) => {
   // USE DESTRUCTURING TO GET VALUES FROM POSTMAN
   const { name, username, email, password } = req.body;
-  const userdetails = { name,email,username };
+  console.log(req.body);
   // GENERATE A UNIQUE ID
   const userid = shortid.generate();
 
@@ -47,15 +30,18 @@ Router.post("/signup", async (req, res) => {
     // EXECUTE THE ABOVE MENTIONED QUERIES
     const check1 = await query(checkEmail);
     const check2 = await query(checkUsername);
+    // console.log(check1, check2);
     //CHECK IF THE EMAIL AND USERNAME ARE UNIQUE
     if (parseData(check1).length == 0 && parseData(check2).length == 0) {
       // SIGNUP QUERY
-      const signup = `INSERT INTO userdetails (userid,name,username,email,password) VALUES ('${userid}','${name}','${username}','${email}','${password}')`;
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const signup = `INSERT INTO userdetails (userid,name,username,email,password) VALUES ('${userid}','${name}','${username}','${email}','${hashedPassword}')`;
       // EXECUTE THE SIGNUP QUERY
       const response = await query(signup);
       // CHECK THE NUMBER OF AFFECTED ROWS
       if (response.affectedRows > 0) {
-        const payload = { userdetails };
+        const payload = req.body;
+
         const token = jwt.sign({ payload }, process.env.JWT_SECRET, { expiresIn: "1d" });
         res.cookie("jwtToken", token, { httpOnly: true });
         res.status(201).json({ msg: "User created successfully" });
@@ -63,6 +49,7 @@ Router.post("/signup", async (req, res) => {
     } else {
       res.status(400).json({ msg: "already exists" });
     }
+    // res.json({ check1, check2 });
   } catch (err) {
     res.status(400).json({ msg: "An error occured" });
   }
@@ -71,21 +58,21 @@ Router.post("/signup", async (req, res) => {
 // LOGIN ROUTE
 Router.post("/login", async (req, res) => {
   // GET VALUES FROM POSTMAN
-  console.log(req.body)
   const { user, password, type } = req.body;
   // type 0 - email || type 1 - username
   try {
     // CHECK TYPE
     if (type == 0) {
       //EMAIL LOGIN
-      
+      // EMAIL LOGIN QUERY
       const login = `SELECT password FROM userdetails WHERE email='${user}'`;
       const response = await query(login);
       // TASK 1: COMPLETE THIS PART i.e COMPLETE THE JWT.SIGN AND COOKIE PART HERE AS WELL
       // res.json({ response });
 
       const userdetails = parseData(response)[0];
-      if (userdetails.password === password) {
+      const check = await bcrypt.compare(password, userdetails.password);
+      if (check) {
         const payload = { userdetails };
         const token = jwt.sign({ payload }, process.env.JWT_SECRET, { expiresIn: "1d" });
         res.cookie("jwtToken", token, { httpOnly: true });
@@ -98,16 +85,17 @@ Router.post("/login", async (req, res) => {
       // USERNAME LOGIN QUERY
       const login = `SELECT * FROM userdetails WHERE username='${user}'`;
       const response = await query(login);
-      console.log(parseData(response));
       // STORE THE USERDETAILS IN VARIABLE FOR EASY ACCESS
       const userdetails = parseData(response)[0];
       // COMPARE PASSWORD
-      if (userdetails.password === password) {
+
+      const check = await bcrypt.compare(password, userdetails.password);
+      console.log(password, userdetails.password);
+      if (check) {
         // STORE USERDETAILS IN PAYLOAD
         const payload = { userdetails };
         // GENERATE TOKEN
         const token = jwt.sign({ payload }, process.env.JWT_SECRET, { expiresIn: "1d" });
-        console.log(token)
         //STORE TOKEN IN COOKIE
         res.cookie("jwtToken", token, { httpOnly: true }); //maxAge: 60000,
         res.status(200).json({ message: "Username Login successful" });
@@ -116,13 +104,8 @@ Router.post("/login", async (req, res) => {
       }
     }
   } catch (e) {
-    console.log(e);
     res.status(401).json({ message: "Invalid credentials" });
   }
 });
 
-Router.post("/logout", auth, async (req, res) => {
-  res.clearCookie("jwtToken");
-  res.status(200).json({ msg: "Logged out successfully" });
-});
 module.exports = Router;
