@@ -27,21 +27,21 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 text-center">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/home">Home</a>
+                <a class="nav-link active" aria-current="page" id="home" href="/home">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/about">About</a>
+                <a class="nav-link" id="about" href="/about">About</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/terms">Terms </a>
+                <a class="nav-link" href="/terms" id="terms">Terms </a>
               </li>
               
             </ul>
             <div class="d-flex me-2 justify-content-center">
               <!-- <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"> -->
-              <button class="btn text-success" onclick="window.location.href='/search'"><i class="fas fa-search"></i> </button>
-              <button class="btn btn-outline-success" onclick="window.location.href='/create'">Create Post</button>
-              <a class="view-profile" href="/users/<%= user.userid %>">
+              <button class="btn text-success" onclick="window.location.href='/search'" id="searchIcon"><i class="fas fa-search"></i> </button>
+              <button class="btn btn-outline-success" id="createPostBtn" onclick="window.location.href='/create'">Create Post</button>
+              <a class="view-profile" id="profileBtn" href="/users/<%= user.userid %>">
                 <img src="/images/user.png" alt="user" class="avatar-tiny">
               </a>
               <button class="btn btn-success btn-logout">Logout</button>

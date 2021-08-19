@@ -160,6 +160,11 @@ nav .avatar-tiny {
   left: 16px;
 }
 
+#searchIcon{
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
 .search button {
   position: absolute;
   top: 5px;
@@ -189,4 +194,19 @@ nav .avatar-tiny {
 
 #like-count{
   text-decoration: none;
+}
+
+#profileBtn{
+  border-radius: 50%;
+  width: 30px;
+  height:30px;
+  margin: 0 20px;
+  display: flex;
+  align-items: center;
+}
+
+#profileBtn > img{
+  width: 100%;
+  height: auto;
+  margin: 0;
 }
