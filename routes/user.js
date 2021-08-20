@@ -62,4 +62,9 @@ Router.get("/users/:id", auth, async (req, res) => {
     }
   });
 
+Router.get("/logout", auth, (req, res) => {
+  res.clearCookie("jwtToken");
+  res.redirect("/");
+})
+
 module.exports = Router;
