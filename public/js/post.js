@@ -55,43 +55,52 @@ if(route.split("/")[3] !== "likes"){
       });
     });
   }
+} else {
+
+  const likePost = document.querySelector("#like-btn") || null;
+  const likeCount = document.querySelector("#like-count");
+  if(likePost){
+    likePost.addEventListener("click", async() => {
+      const likeList = document.querySelectorAll(".liked-list");
+      const likeContainer = document.querySelector("#like-container");
+      try {
+        const response = await axios.post(`/like/${postid}`);
+        likeCount.innerHTML = `(${response.data.likes})`;
+        if(response.data.isLikedByUser == true){
+          likePost.style.color = "red";
+          if(likeList){
+            let isCurrentUserUnliked = true;
+            likeList.forEach(like => {
+              let likeUser = like.attributes.href.value.split("/")[2]
+              if(loggedInUser !== likeUser && isCurrentUserUnliked){
+                likeContainer.innerHTML += `<a href="/users/${currentUser.userid}" class="list-group-item liked-list list-group-item-action">
+                <img class="avatar-tiny" src="/images/user.png" /> <strong>${currentUser.name}</strong>
+                <span class="text-muted small"> ${currentUser.username} </span>
+            </a>`;
+            isCurrentUserUnliked=false;
+              } else {
+                like.style.display = "block";
+              }
+              
+          });
+          }
+        } 
+        else{
+          likePost.style.color = "#fff"
+          if(likeList){
+            likeList.forEach(like => {
+              let user = like.attributes.href.value.split("/")[2]
+              if(loggedInUser === user){
+                like.style.display = "none";
+              }
+          });
+          }
+        } 
+      } catch (error) {
+        console.log(error)
+      }
+  
+    })
+  }
 }
 
-
-const likePost = document.querySelector("#like-btn") || null;
-const likeCount = document.querySelector("#like-count");
-const likeList = document.querySelectorAll(".liked-list");
-if(likePost){
-  likePost.addEventListener("click", async() => {
-    try {
-      const response = await axios.post(`/like/${postid}`);
-      likeCount.innerHTML = `(${response.data.likes})`;
-      if(response.data.isLikedByUser == true){
-        likePost.style.color = "red";
-        if(likeList){
-          likeList.forEach(like => {
-            let user = like.attributes.href.value.split("/")[2]
-            if(loggedInUser === user){
-              like.style.display = "block";
-            }
-        });
-        }
-      } 
-      else{
-        likePost.style.color = "#fff"
-        if(likeList){
-          likeList.forEach(like => {
-            let user = like.attributes.href.value.split("/")[2]
-            if(loggedInUser === user){
-              like.style.display = "none";
-            }
-        });
-        }
-      } 
-      
-    } catch (error) {
-      console.log(error)
-    }
-
-  })
-}
