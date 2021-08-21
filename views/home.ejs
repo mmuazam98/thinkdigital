@@ -3,7 +3,7 @@
     <h2 class="text-center mb-4">The Latest From Those You Follow</h2>
     <div class="list-group">
     <% posts.forEach(post => { %>
-        <a href="/post/<%= post.postid %>" class="list-group-item list-group-item-action">
+        <a href="/post/<%= post.postid %>" class=" post-item list-group-item list-group-item-action">
         <img class="avatar-tiny" src="/images/user.png" /> <strong><%= post.title %> | </strong>
         <i class="fas fa-heart <% if (post["isLikedByUser"]) { %>
           liked

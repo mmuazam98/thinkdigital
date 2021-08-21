@@ -90,7 +90,6 @@ Router.post("/login", async (req, res) => {
       // COMPARE PASSWORD
 
       const check = await bcrypt.compare(password, userdetails.password);
-      console.log(password, userdetails.password);
       if (check) {
         // STORE USERDETAILS IN PAYLOAD
         const payload = { userdetails };

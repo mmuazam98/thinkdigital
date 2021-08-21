@@ -210,3 +210,9 @@ nav .avatar-tiny {
   height: auto;
   margin: 0;
 }
+
+.post-item{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

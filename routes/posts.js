@@ -95,6 +95,7 @@ Router.get("/post/:id", auth, async (req, res) => {
     comments = parseData(comments);
     res.render("post", {likeClass, post, comments, page: "post", user: req.user, isLikedByUser, likes: likes.length});
   } catch (e) {
+    console.log(e)
     res.status(400).json({ msg: "An error occured. Please try again later." });
   }
 });
@@ -110,7 +111,7 @@ Router.get("/post/:postid/likes", auth, async (req, res) => {
     const resLike = await query(getLikes);
     const resPost = await query(getPost);
     const post = parseData(resPost)[0];
-    const likes = parseData(resLike)
+    const likes = parseData(resLike);
     const isLiked = likes.filter(like => {
       return like.userid == req.user.userid;
     })
@@ -119,7 +120,7 @@ Router.get("/post/:postid/likes", auth, async (req, res) => {
     }
     if(isLikedByUser){ likeClass = "liked"};
     if(resLike || resPost) {
-      res.render("likes", { user: req.user, page: "likes", likes, post, isLikedByUser, likeClass });
+      res.render("likes", { user: req.user, page: "post",likes, post, isLikedByUser, likeClass });
     } else throw new Error();
   } catch (error) {
     res.status(400).json({error})
