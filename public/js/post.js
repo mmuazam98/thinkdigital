@@ -55,7 +55,7 @@ if(route.split("/")[3] !== "likes"){
       });
     });
   }
-} else {
+}
 
   const likePost = document.querySelector("#like-btn") || null;
   const likeCount = document.querySelector("#like-count");
@@ -102,5 +102,5 @@ if(route.split("/")[3] !== "likes"){
   
     })
   }
-}
+
 
