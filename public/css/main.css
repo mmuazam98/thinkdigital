@@ -217,8 +217,71 @@ nav .avatar-tiny {
   white-space: nowrap;
 }
 
-@media(max-width: 400px){
+
+#_404-error{
+  position: relative;
+  background:  url("../images/404.gif") no-repeat fixed center;
+  background-size: cover;
+  height: 70vh;
+}
+
+.text-404{
+  position: fixed !important;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.back-home{
+  display: block;
+  margin: 10px auto !important;
+}
+
+.form-group{
+  margin: 25px auto !important;
+  position: relative;
+}
+
+.form-group-error{
+  font-size: 16px;
+  border: solid 2px rgb(255, 88, 88);
+  width: fit-content;
+  border-radius: 0px 0px 10px 10px;
+  padding: 2px 10px;
+  background:rgba(255, 88, 88, 0.397);
+  position: absolute;
+  z-index: -1;
+  bottom: 0px;
+  display: none;
+}
+
+.form-error-out{
+  animation: moveOut ease 1s forwards;
+  display: block;
+}
+
+@keyframes moveOut {
+  0%{
+    bottom: 0px;
+  }
+  100%{
+    bottom: -30px;
+  }
+}
+@media(max-width: 450px){
   #profileNav{
     font-size: 12px;
+  }
+  .container{
+    margin: 40px auto !important;
+  }
+  footer{
+    margin-top: 50px !important;
+  }
+  .form-group{
+    margin: 40px auto;
+  }
+  .form-group-error{
+    font-size: 15px;
   }
 }

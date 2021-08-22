@@ -1,3 +1,75 @@
 <%- include("partials/headerLoggedIn") %>
 
+<div class="container my-4 fs-5">
+    <h1 class="text-center">Edit Details</h1>
+    <h2 class="w-50">
+        <img class="avatar-small" src="/images/user.png" /> <span id="username"><%= user.username %></span>
+        <p class="name"><%= user.name %> </p>
+      </h2>
+    <div class="profile-nav nav nav-tabs pt-2 mb-4" id="profileNav">
+        <a href="/users/edit?tab=details" class=" nav-item nav-link" id="edit-details-tab">
+            Edit Details
+        </a>
+        <a href="/users/edit?tab=password" class="nav-item nav-link" id="edit-password-tab">
+            Change Password
+        </a>
+    </div>
+    <div id="edit-details-container">
+        <form id="edit-details-form">
+            <div class="form-group">
+              <label for="edit-name" class="text-muted mb-1">
+                <small>Name</small>
+              </label>
+              <input autofocus name="title" id="edit-name" class="form-control form-control-lg form-control-title" type="text" placeholder="" autocomplete="off" value="<%= user.name%>" />
+            </div>
+            <div class="form-group">
+                <label for="edit-username" class="text-muted mb-1">
+                  <small>Username</small>
+                </label>
+                <input autofocus name="title" id="edit-username" class="form-control form-control-lg form-control-title" type="text" placeholder="" autocomplete="off" value="<%= user.username%>" />
+              <div class="form-group-error" id="username-error">Username already exists</div>
+            </div>
+            <div class="form-group">
+                <label for="edit-email" class="text-muted mb-1">
+                  <small>Email</small>
+                </label>
+                <input autofocus name="title" id="edit-email" class="form-control form-control-lg form-control-title" type="text" placeholder="" autocomplete="off" value="<%= user.email%>" />
+              <div class="form-group-error" id="email-error">Email already exists</div>
+            </div>
+            <div class="form-group">
+                <label for="edit-details-password" class="text-muted mb-1">
+                  <small>Password</small>
+                </label>
+                <input autofocus name="title" id="edit-details-password" class="form-control form-control-lg form-control-title" type="password" placeholder="Enter Password to Save" required autocomplete="off" />
+            </div>
+            <button class="btn btn-success mt-3" id="submit-btn">Save</button>
+          </form>
+        </div>
+    <div id="edit-password-container">
+        <form id="edit-password-form">
+            <div class="form-group">
+                <label for="edit-password-old" class="text-muted mb-1">
+                  <small>Old Password</small>
+                </label>
+                <input autofocus name="title" id="edit-password-old" class="form-control form-control-lg form-control-title" type="password" placeholder="Old Password" required autocomplete="off" />
+            </div>
+            <div class="form-group">
+                <label for="edit-password-new" class="text-muted mb-1">
+                  <small>New Password</small>
+                </label>
+                <input autofocus name="title" id="edit-password-new" class="form-control form-control-lg form-control-title" type="password" placeholder="New Password" required autocomplete="off" />
+                    <div class="form-group-error" id="password-error">New Password cannot be the same as the old.</div>
+            </div>
+            <button class="btn btn-success mt-3" id="submit-btn">Save</button>
+          </form>
+    </div>
+</div>
+
+<div class="floating-alert alert alert-success text-center floating-alert loginMessage" role="alert" id="success">
+    Details Successfully Changed. Redirecting to your profile.
+</div>
+<div class="floating-alert alert alert-danger text-center floating-alert signupMessage" role="alert" id="not-success">
+    Invalid credentials! Please try again.
+</div>
+
 <%- include("partials/footer") %>

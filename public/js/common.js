@@ -7,12 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const createPostBtn = document.querySelector("#createPostBtn")
       const profileBtn = document.querySelector("#profileBtn")
       if(homeLink || createPostBtn || profileBtn){
-        if(route == "/home") homeLink.style.fontWeight = "bold";
-        else if(route == "/about") aboutLink.style.fontWeight = "bold";
-        else if(route == "/terms") termsLink.style.fontWeight = "bold";
+        if(route == "/home") homeLink.classList.add("active");
+        else if(route == "/about") aboutLink.classList.add("active");
+        else if(route == "/terms") termsLink.classList.add("active");
         else if(route == "/search") searchLink.style.border = "solid 3px green"
         else if(route == "/create") {createPostBtn.style.background = "green"; createPostBtn.style.color = "#fff";}
         else if(route.split("/")[1] == "users") profileBtn.style.border="solid 3px green"
-        else homeLink.style.fontWeight = aboutLink.style.fontWeight = termsLink.style.fontWeight = "initial";
+        else {homeLink.classList.remove("active"); aboutLink.classList.remove("active"); termsLink.classList.remove("active");}
       }
 })
