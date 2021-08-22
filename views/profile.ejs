@@ -11,7 +11,9 @@
             <button class="btn btn-danger btn-sm ml-2 unfollowUser" data-id="<%= profile.userid %>">Stop Following <i class="fas fa-user-times"></i></button>
           <% } %>
         <% } %>
-        <p class="name"><%= profile.name %> </p>
+        <p class="name">
+          <%= profile.name %> 
+        </p>
       </h2>
       <% if(profile.isCurrentUser) { %>
       <div class="edit-btn-container d-flex flex-wrap flex-sm-column justify-content-sm-center justify-content-between mx-auto w-auto">
@@ -42,4 +44,21 @@
         
     </div>
   </div>
+  <script>
+    let link = window.location.hash.substring(1)
+    try {
+      link = JSON.parse(JSON.stringify(link))
+      link = link.split(",");
+      const NAME = decodeURI(link[0]);
+      const USERNAME = link[1]
+      const edited = link[2];
+    
+      if(edited == "editTrue"){
+        document.querySelector("#username").innerHTML = USERNAME;
+        document.querySelector(".name").innerHTML = NAME;
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  </script>
 <%- include("partials/footer") %> 

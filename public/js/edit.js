@@ -105,7 +105,7 @@ const hideModal = () => {
             if(response.status == 200) {
                 successAlert.style.display = "block";
                 setTimeout(() => {
-                    window.location.href = `/users/${loggedInUser}`
+                    window.location.href = `/users/${loggedInUser}#${name},${username},editTrue`
                 }, 2500)
             }
         } catch (error) {
