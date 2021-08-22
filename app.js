@@ -22,6 +22,10 @@ app.use("/", comments);
 app.use("/", follow);
 app.use("/", likes)
 
+app.use(function(req, res, next){
+  res.status(404).render("404", {page: "home"})
+})
+
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {

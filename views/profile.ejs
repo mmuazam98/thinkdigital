@@ -1,19 +1,26 @@
 <%- include("partials/headerLoggedIn") %> 
-<div class="container container--narrow py-md-5">
-    <h2>
-      <img class="avatar-small" src="/images/user.png" /> <span id="username"><%= profile.username %></span> 
-      <% if (!profile.isCurrentUser) { %>
-        <% if (!profile.isFollowing) { %> 
-          <button class="btn btn-primary btn-sm ml-2 followUser" data-id="<%= profile.userid %>">Follow <i class="fas fa-user-plus"></i></button>
+<div class="container container--narrow py-md-5 my-3 fs-6 w-100">
+    <div class="d-flex justify-content-between flex-wrap align-items-center">
+      <h2 class="w-50">
+        <img class="avatar-small" src="/images/user.png" /> <span id="username"><%= profile.username %></span>
+        <% if (!profile.isCurrentUser) { %>
+          <% if (!profile.isFollowing) { %>
+            <button class="btn btn-primary btn-sm ml-2 followUser" data-id="<%= profile.userid %>">Follow <i class="fas fa-user-plus"></i></button>
+          <% } %>
+          <% if (profile.isFollowing) { %>
+            <button class="btn btn-danger btn-sm ml-2 unfollowUser" data-id="<%= profile.userid %>">Stop Following <i class="fas fa-user-times"></i></button>
+          <% } %>
         <% } %>
-        <% if (profile.isFollowing) { %> 
-          <button class="btn btn-danger btn-sm ml-2 unfollowUser" data-id="<%= profile.userid %>">Stop Following <i class="fas fa-user-times"></i></button>
-        <% } %>
+        <p class="name"><%= profile.name %> </p>
+      </h2>
+      <% if(profile.isCurrentUser) { %>
+      <div class="edit-btn-container d-flex flex-wrap flex-sm-column justify-content-sm-center justify-content-between mx-auto w-auto">
+        <button class="btn btn-outline-success fs-6 my-sm-2 mx-2" onclick="window.location.href='/users/edit?tab=details'">Edit Details</button>
+        <button class="btn btn-outline-success fs-6 my-sm-2 mx-2" onclick="window.location.href='/users/edit?tab=password'">Change Password</button>
+      </div>
       <% } %>
-      <p class="name"><%= profile.name %> </p>
-    </h2>
-
-    <div class="profile-nav nav nav-tabs pt-2 mb-4">
+    </div>
+    <div class="profile-nav nav nav-tabs pt-2 mb-4" id="profileNav">
       <a href="/users/<%= profile.userid %>?tab=posts" class=" nav-item nav-link" id="postsTab">
         Posts: <span id="posts">-</span>
       </a>

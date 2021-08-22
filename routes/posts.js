@@ -111,6 +111,7 @@ Router.get("/post/:postid/likes", auth, async (req, res) => {
     const resLike = await query(getLikes);
     const resPost = await query(getPost);
     const post = parseData(resPost)[0];
+    post.createdAt = convert(post.createdAt);
     const likes = parseData(resLike);
     const isLiked = likes.filter(like => {
       return like.userid == req.user.userid;

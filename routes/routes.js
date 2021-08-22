@@ -66,4 +66,7 @@ Router.get("/terms", auth, async (req, res) => {
 Router.get("/about", auth, async (req, res) => {
   res.render("about", { user: req.user, page: "about" });
 });
+Router.get("/users/edit", auth, async (req, res) => {
+  res.render("edit", {user: req.user, page: "edit"})
+})
 module.exports = Router;

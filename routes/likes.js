@@ -9,7 +9,7 @@ Router.use(cookieParser());
 
 const parseData = (x) => {
     return JSON.parse(JSON.stringify(x));
-  };
+  }
 
 const query = util.promisify(con.query).bind(con);
 

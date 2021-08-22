@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const shortid = require("shortid");
 const auth = require("../middleware/auth");
 const { parse } = require("dotenv");
+const bcrypt = require("bcryptjs");
 Router.use(cookieParser());
 
 const parseData = (x) => {
@@ -61,6 +62,61 @@ Router.get("/users/:id", auth, async (req, res) => {
       }
     }
   });
+
+Router.post("/users/:id/edit", auth, async (req, res) => {
+  const {name, username, email, password, newPassword, changeFor, isSaved} = req.body;
+  const userid = req.params.id;
+  const getUser = `SELECT * FROM userdetails WHERE userid='${userid}'`
+  const getName = `SELECT name FROM userdetails WHERE name='${name}'`;
+  const getUserName = `SELECT username FROM userdetails WHERE username='${username}'`;
+  const getEmail = `SELECT email FROM userdetails WHERE email='${email}'`
+  let check = {name: false, username: false, email: false}
+  //changeFor = 0, then edit for details
+  //else edit password
+  try {
+    const User = await query(getUser);
+    let Name = await query(getName);
+    let UserName = await query(getUserName);
+    let Email = await query(getEmail);
+    Name = parseData(Name);
+    UserName = parseData(UserName);
+    Email = parseData(Email);
+    const userPw = parseData(User)[0]
+    const validPass = await bcrypt.compare(password, userPw.password)
+    if(changeFor == 0){
+      
+        if(Name.length > 0) check.name = true;
+        if(UserName.length > 0) check.username = true;
+        if(Email.length > 0) check.email = true;
+       
+        if(isSaved == 1){
+          if(validPass){ 
+            const UpdateUserDetails = `UPDATE userdetails SET name='${name}', username='${username}', email='${email}' WHERE userid='${userid}'`
+            const updatedUser = await query(UpdateUserDetails);
+            if(updatedUser.affectedRows > 0) res.status(201).json({msg: "Details Updated"})
+            else throw new Error();
+          } else throw new Error();
+      } else res.status(201).json({check})
+      
+    } else {
+      if(validPass && username == userPw.username){
+        const hashPassword = await bcrypt.hash(newPassword, 10)
+        const UpdateUserPassword = `UPDATE userdetails SET password='${hashPassword}' WHERE userid='${userid}'`
+        const updatedPassword = await query(UpdateUserPassword);
+        if(updatedPassword.affectedRows > 0){
+          res.status(201).json({msg: "Password Updated"})
+        } else throw new Error();
+      } else throw new Error();
+
+    }
+    
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({msg: "An error has occured!"})
+  }
+    
+  
+})
 
 Router.get("/logout", auth, (req, res) => {
   res.clearCookie("jwtToken");

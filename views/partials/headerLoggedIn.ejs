@@ -55,14 +55,14 @@
               </li>
               
             </ul>
-            <div class="d-flex me-2 justify-content-center">
+            <div class="d-flex me-2 justify-content-center flex-wrap align-items-center">
               <!-- <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"> -->
               <button class="btn text-success" onclick="window.location.href='/search'" id="searchIcon"><i class="fas fa-search"></i> </button>
-              <button class="btn btn-outline-success" id="createPostBtn" onclick="window.location.href='/create'">Create Post</button>
-              <a class="view-profile" id="profileBtn" href="/users/<%= user.userid %>">
+              <button class="btn btn-outline-success fs-6" id="createPostBtn" onclick="window.location.href='/create'">Create Post</button>
+              <a class="view-profile my-3" id="profileBtn" href="/users/<%= user.userid %>">
                 <img src="/images/user.png" alt="user" class="avatar-tiny">
               </a>
-              <a href="/logout"><button class="btn btn-success btn-logout">Logout</button></a>
+              <a href="/logout"><button class="btn btn-success btn-logout my-3">Logout</button></a>
             </div>
 
           </div>
