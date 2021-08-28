@@ -86,7 +86,7 @@ const hideModal = () => {
                 } catch (error) {
                     console.log(error);
                 }
-            }, 800)
+            }, 300)
         })
     })
     
@@ -106,7 +106,7 @@ const hideModal = () => {
                 successAlert.style.display = "block";
                 setTimeout(() => {
                     window.location.href = `/users/${loggedInUser}#${name},${username},editTrue`
-                }, 2500)
+                }, 1500)
             }
         } catch (error) {
             failureAlert.style.display = "block";  
@@ -138,7 +138,7 @@ const hideModal = () => {
                 successAlert.style.display = "block";
                 setTimeout(() => {
                     window.location.href = `/users/${loggedInUser}`
-                }, 2500)
+                }, 1500)
             }
         } catch (error) {
             failureAlert.style.display = "block";  
